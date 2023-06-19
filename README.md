@@ -15,7 +15,7 @@ Space Invaders game should have the following behaviour:
 Domain analysis is an analysis of the problem in order to identify the key factors of the program.
 
 ### Sketch:
-![Sketch of Space Invaders](res\img\sketch.png)
+![Sketch of Space Invaders](https://raw.githubusercontent.com/Tqkoyaki/RacketInvaders/master/res/img/sketch.png)
 
 ### Constant Information:
 1. Width and Height of Screen
