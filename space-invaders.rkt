@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname space-invaders-starter) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname space-invaders) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 (require 2htdp/universe)
 (require 2htdp/image)
 
@@ -107,3 +107,148 @@
 (define G2 (make-game (list I1) (list M1) T1))
 (define G3 (make-game (list I1 I2) (list M1 M2) T1))
 
+
+
+
+;; Functions:
+
+; Game -> Game
+; called to make the game program; start with (main START-GAME)
+
+; To start with game with
+(define START-GAME (make-game empty empty (make-tank (/ WIDTH 2) 0)))
+
+(define (main g)
+  (big-bang g
+    (on-tick update-game) ; Game -> Game
+    (to-draw render-game) ; Game -> Image
+    (on-key input-game))) ; Game KeyEvent -> Game
+
+
+; Game -> Game
+; updates game by advancing invaders, missles, and tank
+#;
+(define (update-game g) g) ; stub
+
+
+(check-expect (update-game G0) (collision (advance-game G0)))
+(check-expect (update-game G1) (collision (advance-game G1)))
+(check-expect (update-game G2) (collision (advance-game G2)))
+(check-expect (update-game G3) (collision (advance-game G3)))
+
+(define (update-game g)
+  (advance-game (collision g)))
+
+
+; Game -> Game
+; moves all the missles and invaders
+#;
+(define (advance-game g) g) ; stub
+
+(check-expect (advance-game G0) (make-game (advance-invaders (game-invaders G0))
+                                           (advance-missiles (game-missiles G0))
+                                           (game-tank G0)))
+(check-expect (advance-game G1) (make-game (advance-invaders (game-invaders G1))
+                                           (advance-missiles (game-missiles G1))
+                                           (game-tank G1)))
+(check-expect (advance-game G2) (make-game (advance-invaders (game-invaders G2))
+                                           (advance-missiles (game-missiles G2))
+                                           (game-tank G2)))
+(check-expect (advance-game G3) (make-game (advance-invaders (game-invaders G3))
+                                           (advance-missiles (game-missiles G3))
+                                           (game-tank G3)))
+
+(define (advance-game g)
+  (make-game (advance-invaders (game-invaders g))
+             (advance-missiles (game-missiles g))
+             (game-tank g)))
+
+
+; ListOfMissiles -> ListOfMissiles
+; updates all the missles
+#;
+(define (advance-missiles lom) lom) ; stub
+
+(check-expect (advance-missiles (game-missiles G0)) (move-missiles (clean-missiles (game-missiles G0))))
+(check-expect (advance-missiles (game-missiles G1)) (move-missiles (clean-missiles (game-missiles G1))))
+(check-expect (advance-missiles (game-missiles G2)) (move-missiles (clean-missiles (game-missiles G2))))
+(check-expect (advance-missiles (game-missiles G3)) (move-missiles (clean-missiles (game-missiles G3))))
+(check-expect (advance-missiles (list (make-missile 100 (+ HEIGHT 10))
+                                      (make-missile 100 (/ HEIGHT 2))))
+              (list (make-missile 100 (+ (/ HEIGHT 2) MISSILE-SPEED))))
+
+(define (advance-missiles lom)
+  (move-missiles (clean-missiles lom)))
+
+
+; ListOfMissles -> ListOfMissles
+; moves all the missles
+#;
+(define (move-missiles lom) lom)
+
+(check-expect (move-missiles (game-missiles G0)) (game-missiles G0))
+(check-expect (move-missiles (game-missiles G1)) (game-missiles G1))
+(check-expect (move-missiles (game-missiles G2)) (list (make-missile 150 (+ 300 MISSILE-SPEED))))
+(check-expect (move-missiles (game-missiles G3)) (list (make-missile 150 (+ 300 MISSILE-SPEED))
+                                                    (make-missile (invader-x I1) (+ (invader-y I1) 10 MISSILE-SPEED))))
+
+(define (move-missiles lom)
+  (cond [(empty? lom) empty]
+        [else
+         (cons (make-missile (missile-x (first lom))
+                             (+ (missile-y (first lom))
+                                MISSILE-SPEED))
+              (move-missiles (rest lom)))]))
+
+
+; ListOfMissles -> ListOfMissles
+; removes all missles that are past the screen
+#;
+(define (clean-missiles lom) lom)
+
+(check-expect (clean-missiles empty) empty)
+(check-expect (clean-missiles (list (make-missile 150 (/ HEIGHT 2)))) (list (make-missile 150 (/ HEIGHT 2))))
+(check-expect (clean-missiles (list (make-missile 250 (+ HEIGHT 25)))) empty)
+(check-expect (clean-missiles (list (make-missile 150 (/ HEIGHT 3)) (make-missile 50 (+ HEIGHT 5)))) (list (make-missile 150 (/ HEIGHT 3))))
+
+(define (clean-missiles lom)
+  (cond [(empty? lom) empty]
+        [else
+         (if (> HEIGHT (missile-y (first lom)))
+             (cons (first lom) (clean-missiles (rest lom)))
+             (clean-missiles (rest lom)))]))
+
+
+; ListOfInvaders -> ListOfInvaders
+; updates all the invaders
+(define (advance-invaders loi) loi) ; stub
+
+(check-expect (advance-invaders (game-invaders G0)) (spawn-invaders (move-invaders (game-invaders G0))))
+(check-expect (advance-invaders (game-invaders G1)) (spawn-invaders (move-invaders (game-invaders G1))))
+(check-expect (advance-invaders (game-invaders G2)) (spawn-invaders (move-invaders (game-invaders G2))))
+(check-expect (advance-invaders (game-invaders G3)) (spawn-invaders (move-invaders (game-invaders G3))))
+
+
+; ListOfInvaders -> ListOfInvaders
+; moves all the invaders already on the screen
+(define (move-invaders loi) loi) ; stub
+
+
+; ListOfInvaders -> ListOfInvaders
+; spawns new invaders onto the top of the screen
+(define (spawn-invaders loi) loi) ; stub
+
+
+; Game -> Game
+; updates list of invaders and missles based on if they collided
+(define (collision g) g) ; stub
+
+
+; Game -> Image
+; renders the game's invaders, missles, and tank
+(define (render-game g) g) ; stub
+
+
+; Game KeyEvent -> Game
+; takes user input to manipulate the tank
+(define (input-game g ke) g) ; stub
