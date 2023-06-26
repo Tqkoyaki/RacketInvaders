@@ -107,3 +107,12 @@
 (define G2 (make-game (list I1) (list M1) T1))
 (define G3 (make-game (list I1 I2) (list M1 M2) T1))
 
+
+
+;; Functions:
+
+; Game -> Game
+; called to let the space invader game. Start with (main START_GAME)
+; no tests for main function
+
+(define START_GAME (make-game empty empty (make-tank (/ WIDTH 2) (- HEIGHT TANK-HEIGHT/2))))
