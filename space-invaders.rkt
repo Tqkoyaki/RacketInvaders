@@ -162,14 +162,14 @@
 (define (move g) g) ; stub
 
 (check-expect (move (make-game empty empty T0))
-              (make-game empty empty T0))
+              (make-game empty empty (move-tank T0)))
 (check-expect (move (make-game
                      (list (make-invader (/ WIDTH 2) (/ HEIGHT 2) 5))
                      (list (make-missile (/ WIDTH 2) (/ HEIGHT 2)))
                      T1))
               (make-game (move-invaders (direct-invaders (list (make-invader (/ WIDTH 2) (/ HEIGHT 2) 5))))
                          (clean-missiles (move-missiles (list (make-missile (/ WIDTH 2) (/ HEIGHT 2)))))
-                         T1))
+                         (move-tank T1)))
 (check-expect (move (make-game
                      (list (make-invader (/ WIDTH 2) (/ HEIGHT 2) -5)
                            (make-invader (- WIDTH 1) 100 3)
@@ -186,12 +186,12 @@
                                         (make-missile (/ WIDTH 2) (/ HEIGHT 2))
                                         (make-missile (/ WIDTH 3) (/ HEIGHT 3))
                                         (make-missile (/ WIDTH 2) -5))))
-                         T1))
+                         (move-tank T1)))
 
 (define (move g)
   (make-game (move-invaders (direct-invaders (game-invaders g)))
              (clean-missiles (move-missiles (game-missiles g)))
-             (game-tank g)))
+             (move-tank (game-tank g))))
 
 
 ; ListOfInvaders -> ListOfInvaders
@@ -315,6 +315,59 @@
         [else (clean-missiles (rest lom))]))
 
 
+; Tank -> Tank
+; moves the tank
+; :::
+#;
+(define (move-tank t) t) ; stub
+
+(check-expect (move-tank (make-tank 50 1))
+              (make-tank (+ 50 TANK-SPEED) 1))
+(check-expect (move-tank (make-tank 50 -1))
+              (make-tank (- 50 TANK-SPEED) -1))
+(check-expect (move-tank (make-tank 0 -1))
+              (make-tank 0 -1))
+(check-expect (move-tank (make-tank WIDTH 1))
+              (make-tank WIDTH 1))
+
+(define (move-tank t)
+  (if (= (tank-dir t) -1)
+      (tank-left t)
+      (tank-right t)))
+
+ 
+; Tank -> Tank
+; moves the tank left
+#;
+(define (tank-left t) t) ; stub
+
+(check-expect (tank-left (make-tank 120 -1))
+              (make-tank (- 120 TANK-SPEED) -1))
+(check-expect (tank-left (make-tank 0 -1))
+              (make-tank 0 -1))
+
+(define (tank-left t)
+  (if (> (tank-x t) 0)
+      (make-tank (- (tank-x t) TANK-SPEED)
+                 -1)
+      t))
+
+; Tank -> Tank
+; moves the tank right
+#;
+(define (tank-right t) t) ; stub
+
+(check-expect (tank-right (make-tank 160 1))
+              (make-tank (+ 160 TANK-SPEED) 1))
+(check-expect (tank-right (make-tank WIDTH 1))
+              (make-tank WIDTH 1))
+
+(define (tank-right t)
+  (if (< (tank-x t) WIDTH)
+      (make-tank (+ (tank-x t) TANK-SPEED)
+                 1)
+      t))
+
 ; Game -> Image
 ; renders the game onto the screen
 ; :::
@@ -406,7 +459,71 @@
 ; Game KeyEvent -> Game
 ; takes input from keyboard and updates game off it
 ; :::
+#;
 (define (input-game g ke) g) ; stub
+
+(check-expect (input-game (make-game empty
+                                     (list (make-missile 120 150))
+                                     (make-tank 100 -1))
+                          " ")
+              (make-game empty
+                         (list (make-missile 100 (- HEIGHT TANK-HEIGHT/2))
+                               (make-missile 120 150))
+                         (make-tank 100 -1)))
+(check-expect (input-game (make-game empty
+                                     (list (make-missile 120 150))
+                                     (make-tank 100 -1))
+                          "left")
+              (make-game empty
+                         (list (make-missile 120 150))
+                         (make-tank 100 -1)))
+(check-expect (input-game (make-game empty
+                                     (list (make-missile 120 150))
+                                     (make-tank 100 1))
+                          "left")
+              (make-game empty
+                         (list (make-missile 120 150))
+                         (make-tank 100 -1)))
+(check-expect (input-game (make-game empty
+                                     (list (make-missile 120 150))
+                                     (make-tank 100 1))
+                          "right")
+              (make-game empty
+                         (list (make-missile 120 150))
+                         (make-tank 100 1)))
+(check-expect (input-game (make-game empty
+                                     (list (make-missile 120 150))
+                                     (make-tank 100 -1))
+                          "right")
+              (make-game empty
+                         (list (make-missile 120 150))
+                         (make-tank 100 1)))
+(check-expect (input-game (make-game empty
+                                     (list (make-missile 120 150))
+                                     (make-tank 100 1))
+                          "a")
+              (make-game empty
+                         (list (make-missile 120 150))
+                         (make-tank 100 1)))
+
+(define (input-game g ke)
+  (cond [(string=? ke " ")
+         (make-game (game-invaders g)
+                    (cons (make-missile (tank-x (game-tank g))
+                                        (- HEIGHT TANK-HEIGHT/2))
+                          (game-missiles g))
+                    (game-tank g))]
+        [(string=? ke "left")
+         (make-game (game-invaders g)
+                    (game-missiles g)
+                    (make-tank (tank-x (game-tank g))
+                               -1))]
+        [(string=? ke "right")
+         (make-game (game-invaders g)
+                    (game-missiles g)
+                    (make-tank (tank-x (game-tank g))
+                               1))]
+        [else g]))
 
 
 (main (make-game (list (make-invader 100 120 12)
