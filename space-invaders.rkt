@@ -12,8 +12,8 @@
 (define WIDTH  300)
 (define HEIGHT 500)
 
-(define INVADER-X-SPEED 1.5)  ;speeds (not velocities) in pixels per tick
-(define INVADER-Y-SPEED 1.5)
+(define INVADER-X-SPEED 5)  ;speeds (not velocities) in pixels per tick
+(define INVADER-Y-SPEED 5)
 (define TANK-SPEED 2)
 (define MISSILE-SPEED 10)
 
@@ -101,7 +101,6 @@
   (... (missile-x m) (missile-y m)))
 
 
-
 (define G0 (make-game empty empty T0))
 (define G1 (make-game empty empty T1))
 (define G2 (make-game (list I1) (list M1) T1))
@@ -131,13 +130,13 @@
 #;
 (define (update-game g) g) ; stub
 
-(check-expect (update-game G0)
+(check-random (update-game G0)
               (spawn (collision (move G0))))
-(check-expect (update-game G1)
+(check-random (update-game G1)
               (spawn (collision (move G1))))
-(check-expect (update-game G2)
+(check-random (update-game G2)
               (spawn (collision (move G2))))
-(check-expect (update-game G3)
+(check-random (update-game G3)
               (spawn (collision (move G3))))
 
 (define (update-game g)
@@ -146,7 +145,30 @@
 ; Game -> Game
 ; spawns new invaders
 ; :::
+#;
 (define (spawn g) g) ; stub
+
+(check-random (spawn (make-game empty empty T0))
+              (make-game (if (< (random 1000) INVADE-RATE)
+                             (cons (make-invader (random WIDTH) 0 (+ (random INVADER-X-SPEED) 1))
+                                   empty)
+                             empty) empty T0))
+(check-random (spawn (make-game (list (make-invader 150 100 6))
+                                empty T0))
+              (make-game (if (< (random 1000) INVADE-RATE)
+                             (cons (make-invader (random WIDTH) 0 (+ (random INVADER-X-SPEED) 1))
+                                   (list (make-invader 150 100 6)))
+                             (list (make-invader 150 100 6))) empty T0))
+
+(define (spawn g)
+  (make-game (if (< (random 1000) INVADE-RATE)
+                 (cons (make-invader (random WIDTH)
+                                     0
+                                     (+ (random INVADER-X-SPEED) 1))
+                       (game-invaders g))
+                 (game-invaders g))
+             (game-missiles g)
+             (game-tank g)))
 
 
 ; Game -> Game
@@ -376,21 +398,21 @@
 
 (check-expect (render-game G0)
               (render-invaders (game-invaders G0)
-                               (render-missiles (game-missiles G0)
-                                                (render-tank (game-tank G0) BACKGROUND))))
+                               (render-tank (game-tank G0)
+                                                (render-missiles (game-missiles G0) BACKGROUND))))
 (check-expect (render-game G2)
               (render-invaders (game-invaders G2)
-                               (render-missiles (game-missiles G2)
-                                                (render-tank (game-tank G2) BACKGROUND))))
+                               (render-tank (game-tank G2)
+                                                (render-missiles (game-missiles G2) BACKGROUND))))
 (check-expect (render-game G3)
               (render-invaders (game-invaders G3)
-                               (render-missiles (game-missiles G3)
-                                                (render-tank (game-tank G3) BACKGROUND))))
+                               (render-tank (game-tank G3)
+                                                (render-missiles (game-missiles G3) BACKGROUND))))
 
 (define (render-game g)
               (render-invaders (game-invaders g)
-                               (render-missiles (game-missiles g)
-                                                (render-tank (game-tank g) BACKGROUND))))
+                               (render-tank (game-tank g)
+                                                (render-missiles (game-missiles g) BACKGROUND))))
 
 
 ; ListOfInvaders Image -> Image
