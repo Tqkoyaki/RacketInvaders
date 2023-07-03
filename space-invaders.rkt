@@ -174,7 +174,121 @@
 ; Game -> Game
 ; removes missiles and invaders that have collided
 ; :::
+#;
 (define (collision g) g) ; stub
+
+(check-expect (collision (make-game (list I1) (list M1) T0))
+              (make-game (list I1) (list M1) T0))
+(check-expect (collision (make-game (list I1) (list M1 M2) T0))
+              (make-game empty (list M1) T0))
+(check-expect (collision (make-game (list I1 I2) (list M1 M2) T0))
+              (make-game (list I2) (list M1) T0))
+
+(define (collision g)
+  (make-game (collide-invaders (game-invaders g) (game-missiles g))
+             (collide-missiles (game-invaders g) (game-missiles g))
+             (game-tank g)))
+
+
+; ListOfInvaders ListOfMissiles -> ListOfInvaders
+; removes the invaders if collided missiles
+; :::
+#;
+(define (collide-invaders loi lom) loi) ; stub
+
+(check-expect (collide-invaders (list I1)
+                                (list M1))
+              (list I1))
+(check-expect (collide-invaders (list I1 I2)
+                                (list M1 M2))
+              (list I2))
+
+(define (collide-invaders loi lom)
+  (cond [(empty? lom) loi]
+        [else
+         (collide-invaders
+          (collide-invaders-helper loi (first lom))
+          (rest lom))]))
+
+
+; ListOfInvaders Missile -> ListOfInvaders
+; removes the invaders if the missile collided
+; :::
+#;
+(define (collide-invaders-helper loi m) loi) ; stub
+
+(check-expect (collide-invaders-helper (list I1) M1)
+              (list I1))
+(check-expect (collide-invaders-helper (list I1 I2) M1)
+              (list I1 I2))
+(check-expect (collide-invaders-helper (list I1 I2) M2)
+              (list I2))
+
+(define (collide-invaders-helper loi m)
+  (cond [(empty? loi) empty]
+        [else
+         (if (collided? (first loi) m)
+             (collide-invaders-helper (rest loi) m)
+             (cons (first loi)
+                   (collide-invaders-helper (rest loi) m)))]))
+             
+
+; Invader Missile -> Boolean
+; true if the missile collided with the invader
+; :::
+#;
+(define (collided? i m) false) ; stub
+
+(check-expect (collided? I1 M1) false)
+(check-expect (collided? I1 M2) true)
+(check-expect (collided? I1 M3) true)
+
+(define (collided? i m)
+  (and (and (>= (invader-x i) (- (missile-x m) HIT-RANGE))
+            (<= (invader-x i) (+ (missile-x m) HIT-RANGE)))
+       (and (>= (invader-y i) (- (missile-y m) HIT-RANGE))
+            (<= (invader-y i) (+ (missile-y m) HIT-RANGE)))))
+
+
+; ListOfInvaders ListOfMissiles -> ListOfMissiles
+; removes the missiles if collided invaders
+; :::
+#;
+(define (collide-missiles loi lom) lom) ; stub
+
+(check-expect (collide-missiles (list I1)
+                                (list M1))
+              (list M1))
+(check-expect (collide-missiles (list I1 I2)
+                                (list M1 M2))
+              (list M1))
+
+(define (collide-missiles loi lom)
+  (cond [(empty? loi) lom]
+        [else
+         (collide-missiles
+          (rest loi)
+          (collide-missiles-helper (first loi) lom))]))
+
+
+; Invader ListOfMissiles -> ListOfMissiles
+; removes the missiles if collided invader
+; :::
+#;
+(define (collide-missiles-helper i lom) lom) ; stub
+
+(check-expect (collide-missiles-helper I1 (list M1))
+              (list M1))
+(check-expect (collide-missiles-helper I1 (list M1 M2))
+              (list M1))
+
+(define (collide-missiles-helper i lom)
+  (cond [(empty? lom) empty]
+        [else
+         (if (collided? i (first lom))
+             (collide-missiles-helper i (rest lom))
+             (cons (first lom)
+                   (collide-missiles-helper i (rest lom))))]))
 
 
 ; Game -> Game
