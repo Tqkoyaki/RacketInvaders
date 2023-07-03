@@ -662,11 +662,4 @@
         [else g]))
 
 
-(main (make-game (list (make-invader 100 120 12)
-                       (make-invader 260 135 6)
-                       (make-invader 150 400 -12)
-                       (make-invader 30 175 -10))
-                 (list (make-missile 200 100)
-                       (make-missile 200 60)
-                       (make-missile 60 400))
-                 (make-tank 50 1)))
+(main START_GAME)
