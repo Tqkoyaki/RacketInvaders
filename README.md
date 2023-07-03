@@ -1,6 +1,8 @@
-# Racket Invaders
+# Racket Invaders 
 
-This is the final project for [How to Code: Simple Data](https://learning.edx.org/course/course-v1:UBCx+HtC1x+2T2017/home) avaliable on Edx. The goal of the project is to recreate the Space Invaders game released in 1978. The racket file has been compiled to an executable (exe) file and is playable on windows.
+[![Open Source Society University - Computer Science](https://img.shields.io/badge/OSSU-computer--science-blue.svg)](https://github.com/ossu/computer-science)
+
+This is the final project for [How to Code: Simple Data](https://learning.edx.org/course/course-v1:UBCx+HtC1x+2T2017/home) avaliable on Edx. The goal of the project is to recreate the Space Invaders game released in 1978. The racket file has been compiled to an executable (exe) file and is playable on windows. 
 
 ## Problem:
 Space Invaders game should have the following behaviour:
