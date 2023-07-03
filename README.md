@@ -40,3 +40,16 @@ Domain analysis is an analysis of the problem in order to identify the key facto
 1. on-tick
 2. on-draw
 3. on-key
+
+## End Result
+The game has been completed all the project requirements and followed all the criterias. The game currently is able to take human input to move and shoot. It also spawns invaders randomly at the top with different speeds and finally, the missles and invaders are removed once they collided.
+
+A better version of this game could include a score system with player lives. The game could also show a game over screen.
+
+## How to Play
+The game was complied into an executable file (.exe) which allows anyone to open it and play on a Windows computer.
+
+The controls are:
+1. Left Arrow: Moves the Tank Left
+2. Right Arrow: Moves the Tank Right
+3. Space Bar: Shoots a Missile
