@@ -19,7 +19,7 @@
 
 (define HIT-RANGE 10)
 
-(define INVADE-RATE 100)
+(define INVADE-RATE 50)
 
 (define BACKGROUND (empty-scene WIDTH HEIGHT))
 
